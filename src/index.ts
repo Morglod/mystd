@@ -40,3 +40,16 @@ export function normalizeKeys<T extends { [x: string]: any }>(
 
     return x;
 }
+
+export function groupItemsBy<T, Key extends keyof T>(key: Key, items: T[]): {
+    [x in string|number|symbol]: T[]
+} {
+    const result = {} as any;
+
+    for (const item of items) {
+        if (!result[key]) result[key] = [];
+        result[key].push(item);
+    }
+
+    return result;
+}
