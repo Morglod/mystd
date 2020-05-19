@@ -74,3 +74,10 @@ export function isInTreeDOM(rootEl: Node, clicked: Node): boolean {
 
   return clicked === rootEl;
 }
+
+export function assignStyle(el: HTMLElement, style: Partial<CSSStyleDeclaration>) {
+    for (const k in style) {
+        (el.style as any)[k] = style[k];
+    }
+    return el;
+}
