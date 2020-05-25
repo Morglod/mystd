@@ -1,4 +1,4 @@
-import { ObjectPathTuple, anyIndex, pathTupleInObject, joinObjectPath, PathTravelable, PathTravel, ObjectPathKey, ObjectPathSpecialKey, ObjectPath } from './object-path';
+import { ObjectPathTuple, anyIndex, _pathTupleInObject, _joinObjectPathTuple, PathTravelable, _PathTravel, ObjectPathKey, ObjectPathSpecialKey, ObjectPath } from './object-path';
 import { GroupOp, groupOf, flattenMergeGroups, isGroup } from './group-op';
 
 function travelPathTuplePart<T>(obj: GroupOp<T>, nextField: ObjectPathKey, withParents: 'withParents'): GroupOp<{
@@ -75,8 +75,8 @@ export function travelPath<T, TP extends ObjectPath<any>>(obj: T, path: TP, with
     return travelPathTuple(obj, path.tuple(), withParents as any);
 }
 
-export function selectPath<T extends PathTravelable, EndValueT>(obj: T, pathSpecifier: (o: PathTravel<T, never>) => EndValueT, withParents?: false): GroupOp<EndValueT>;
-export function selectPath<T extends PathTravelable, EndValueT>(obj: T, pathSpecifier: (o: PathTravel<T, never>) => EndValueT, withParents: 'withParents'): GroupOp<{
+export function selectPath<T extends PathTravelable, EndValueT>(obj: T, pathSpecifier: (o: _PathTravel<T, never>) => EndValueT, withParents?: false): GroupOp<EndValueT>;
+export function selectPath<T extends PathTravelable, EndValueT>(obj: T, pathSpecifier: (o: _PathTravel<T, never>) => EndValueT, withParents: 'withParents'): GroupOp<{
     parentGroup: GroupOp<any>
     parent: any;
     item: EndValueT;
@@ -89,10 +89,10 @@ export function selectPath<T extends PathTravelable, EndValueT>(obj: T, pathObje
 }>;
 export function selectPath<T extends PathTravelable, EndValueT>(
     obj: T,
-    pathSpecifier_pathObject: ((o: PathTravel<T, never>) => EndValueT)|ObjectPath<EndValueT>,
+    pathSpecifier_pathObject: ((o: _PathTravel<T, never>) => EndValueT)|ObjectPath<EndValueT>,
     withParents?: false|'withParents'
 ) {
-    const tuple = typeof pathSpecifier_pathObject === 'function' ? pathTupleInObject(obj, pathSpecifier_pathObject) : pathSpecifier_pathObject.tuple();
+    const tuple = typeof pathSpecifier_pathObject === 'function' ? _pathTupleInObject(obj, pathSpecifier_pathObject) : pathSpecifier_pathObject.tuple();
     return travelPathTuple(obj, tuple, withParents as any);
 }
 
@@ -131,4 +131,56 @@ export function spreadOnFields<T extends {
     }
 
     return items;
+}
+
+type UpdateByPathUpdater_Commit<EndValueT> = {
+    [k in keyof Partial<EndValueT>]: (
+        EndValueT[k] |
+        GroupOp<EndValueT[k]>
+    )
+} & {
+    [k2: string]: (
+        any |
+        GroupOp<any>
+    )
+};
+
+type UpdateByPathUpdater<ParentT, EndValueT, NewT> = (ctx: {
+    g: GroupOp<EndValueT>,
+    item: EndValueT,
+    itemUpdateIndex: number,
+    update: (commit: UpdateByPathUpdater_Commit<EndValueT & NewT>) => void,
+    path: ObjectPath<EndValueT>,
+    selectChildren: <EndValueT2>(pathSpecifier: (o: _PathTravel<EndValueT, never>) => EndValueT2) => GroupOp<EndValueT2>,
+}) => void;
+
+export function updateByPath<T extends PathTravelable, EndValueT, NewT>(obj: T, pathSpecifier: (o: _PathTravel<T, never>) => EndValueT, updater: UpdateByPathUpdater<any, EndValueT, NewT>): GroupOp<EndValueT & NewT>;
+export function updateByPath<T extends PathTravelable, EndValueT, NewT>(obj: T, pathObject: ObjectPath<EndValueT>, updater: UpdateByPathUpdater<any, EndValueT, NewT>): GroupOp<EndValueT & NewT>;
+
+export function updateByPath<T extends PathTravelable, EndValueT, NewT>(obj: T, pathObject_pathSpecifier: ((o: _PathTravel<T, never>) => EndValueT) | ObjectPath<EndValueT>, updater: UpdateByPathUpdater<any, EndValueT, NewT>) {
+    const objPath = typeof pathObject_pathSpecifier === 'function' ? ObjectPath.from(obj, pathObject_pathSpecifier) : pathObject_pathSpecifier;
+    const selectedObj = selectPath(obj, objPath) as GroupOp<EndValueT>;
+
+    selectedObj.forEach((item, itemIndex, gItems, g) => {
+        const ctx = {
+            item,
+            g,
+            itemUpdateIndex: itemIndex,
+            path: objPath,
+            selectChildren: (pathSpecifier: any) => selectPath(item, pathSpecifier) as any,
+            update: (partialCommit: UpdateByPathUpdater_Commit<EndValueT>) => {
+                for (const k in partialCommit) {
+                    if (GroupOp.isGroup(partialCommit[k])) {
+                        (item as any)[k] = (partialCommit[k] as GroupOp<any>).pickItem(itemIndex);
+                    } else {
+                        (item as any)[k] = partialCommit[k];
+                    }
+                }
+            }
+        };
+
+        updater(ctx);
+    });
+
+    return selectedObj as any;
 }

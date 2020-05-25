@@ -47,9 +47,18 @@ export function groupItemsBy<T, Key extends keyof T>(key: Key, items: T[]): {
     const result = {} as any;
 
     for (const item of items) {
-        if (!result[key]) result[key] = [];
-        result[key].push(item);
+        const k = item[key];
+        if (!result[k]) result[k] = [];
+        result[k].push(item);
     }
 
     return result;
+}
+
+export function entriesToObject<KV extends [ any, any ]>(kv: KV[]) {
+    return kv.reduce((sum, [ k, v ]) => Object.assign(sum, { [k]: v }), {});
+}
+
+export function filterKeys<T>(item: T, filter: (key: keyof T, item: T) => boolean): Partial<T> {
+    return entriesToObject(Object.entries(item).filter(([k,]) => filter(k as any, item)));
 }

@@ -1,8 +1,8 @@
-type PickFuncs<T> = {
+type _PickFuncs<T> = {
     [k in keyof T]: T[k] extends (...args: any) => any ? T[k] : never
 };
 
-type GroupOpItems<T> = { length: number, [index: number]: T };
+export type GroupOpItems<T> = { length: number, [index: number]: T };
 
 export class GroupOp<T> {
     constructor(
@@ -19,7 +19,7 @@ export class GroupOp<T> {
     _inplaceMapDeep?: boolean;
 
     call<
-        FuncK extends keyof PickFuncs<T>,
+        FuncK extends keyof _PickFuncs<T>,
         _CheckReturn = T[FuncK] extends (...a: any) => any ? ReturnType<T[FuncK]> : never,
     >(
         func: FuncK,
@@ -27,7 +27,7 @@ export class GroupOp<T> {
     ): GroupOp<{ item: T, result: _CheckReturn }>;
 
     call<
-        FuncK extends keyof PickFuncs<T>,
+        FuncK extends keyof _PickFuncs<T>,
         _CheckReturn = T[FuncK] extends (...a: any) => any ? ReturnType<T[FuncK]> : never,
     >(
         func: FuncK,
@@ -36,7 +36,7 @@ export class GroupOp<T> {
     ): GroupOp<T>;
 
     call<
-        FuncK extends keyof PickFuncs<T>,
+        FuncK extends keyof _PickFuncs<T>,
         _CheckReturn = T[FuncK] extends (...a: any) => any ? ReturnType<T[FuncK]> : never,
     >(
         func: FuncK,

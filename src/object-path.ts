@@ -20,20 +20,20 @@ export type ObjectPathKey<T=unknown> = (T extends unknown ? ObjectPathBaseKey : 
 
 export type ObjectPathTuple<EndValueT> = (ObjectPathKey[] & { ___endType: EndValueT });
 
-export function objectPathTupleFromArray<EndValueT>(arr: ObjectPathKey[]): ObjectPathTuple<EndValueT> {
+export function _objectPathTupleFromArray<EndValueT>(arr: ObjectPathKey[]): ObjectPathTuple<EndValueT> {
     return arr as any;
 }
 
 export class ObjectPath<EndValueT> {
     constructor(tuple?: ObjectPathTuple<EndValueT>) {
-        this._tuple = tuple || objectPathTupleFromArray([]);
+        this._tuple = tuple || _objectPathTupleFromArray([]);
     }
 
     static from<T extends PathTravelable, EndValueT>(
         o: T,
-        pathSpecifier: (o: PathTravel<T, never>) => EndValueT
+        pathSpecifier: (o: _PathTravel<T, never>) => EndValueT
     ): ObjectPath<EndValueT> {
-        return new ObjectPath(pathTupleInObject(o, pathSpecifier));
+        return new ObjectPath(_pathTupleInObject(o, pathSpecifier));
     }
 
     readonly _typeof_endType!: EndValueT;
@@ -43,8 +43,8 @@ export class ObjectPath<EndValueT> {
         return this._tuple;
     }
 
-    join<EndValueT2>(pathSpecifier: (o: PathTravel<EndValueT, never>) => EndValueT2) {
-        const newPath = joinObjectPath(this._tuple, pathSpecifier);
+    join<EndValueT2>(pathSpecifier: (o: _PathTravel<EndValueT, never>) => EndValueT2) {
+        const newPath = _joinObjectPathTuple(this._tuple, pathSpecifier);
         return new ObjectPath(newPath);
     }
 }
@@ -61,7 +61,7 @@ type _PathTravelBase<
     T extends PathTravelable,
     Prev extends PathTravelPrev|never = never,
 > = {
-    [k in keyof T]: T[k] extends PathTravelable ? PathTravel<
+    [k in keyof T]: T[k] extends PathTravelable ? _PathTravel<
         T[k],
         {
             prev: Prev,
@@ -76,22 +76,22 @@ type _PathTravelSpecials<
     Prev extends PathTravelPrev|never = never,
 > = {
     ____prevType: Prev,
-    $anyIndex: PathTravel<T[any]>,
-    $keys<K extends keyof T>(keys: K[]): PathTravel<T[K]>;
-    $exceptKeys<K extends keyof T>(keys: K[]): PathTravel<T[Exclude<keyof T, K>]>;
+    $anyIndex: _PathTravel<T[any]>,
+    $keys<K extends keyof T>(keys: K[]): _PathTravel<T[K]>;
+    $exceptKeys<K extends keyof T>(keys: K[]): _PathTravel<T[Exclude<keyof T, K>]>;
     /** filter prevous item in path */
-    $filter(filter: (item: T, itemIndex: number, items: T[]) => boolean): PathTravel<T>;
+    $filter(filter: (item: T, itemIndex: number, items: T[]) => boolean): _PathTravel<T>;
 };
 
-export type PathTravel<
+export type _PathTravel<
     T extends PathTravelable,
     Prev extends PathTravelPrev|never = never,
     _WithSpecials = true
 > = _WithSpecials extends false ? _PathTravelBase<T, Prev> : _PathTravelBase<T, Prev> & _PathTravelSpecials<T, Prev>;
 
-export function pathTupleInObject<T extends PathTravelable, EndValueT>(
+export function _pathTupleInObject<T extends PathTravelable, EndValueT>(
     o: T,
-    pathSpecifier: (o: PathTravel<T, never>) => EndValueT,
+    pathSpecifier: (o: _PathTravel<T, never>) => EndValueT,
     _pathParts?: ObjectPathKey[]
 ): ObjectPathTuple<EndValueT> {
     let parts: ObjectPathKey[] = _pathParts || [];
@@ -132,9 +132,9 @@ export function pathTupleInObject<T extends PathTravelable, EndValueT>(
     return _pathFromPathProxy(pathSpecifier(proxy));
 }
 
-export function joinObjectPath<T extends PathTravelable, EndValueT>(
+export function _joinObjectPathTuple<T extends PathTravelable, EndValueT>(
     path: ObjectPathTuple<T>,
-    pathSpecifier: (o: PathTravel<T, never>) => EndValueT
+    pathSpecifier: (o: _PathTravel<T, never>) => EndValueT
 ): ObjectPathTuple<EndValueT> {
-    return pathTupleInObject(undefined!, pathSpecifier, [ ...path ]) as any;
+    return _pathTupleInObject(undefined!, pathSpecifier, [ ...path ]) as any;
 }
