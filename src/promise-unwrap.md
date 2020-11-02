@@ -1,4 +1,4 @@
-# promiseUnwrap<T>()
+# `promiseUnwrap<T>()`
 
 ## Example
 
