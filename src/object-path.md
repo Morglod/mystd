@@ -1,7 +1,7 @@
 # object-path
 
 ```ts
-import { ObjectPath, anyIndex } from '../object-path';
+import { ObjectPath } from '../object-path';
 
 const obj = {
     x: {
@@ -21,5 +21,11 @@ const obj = {
 }
 
 const pathTuple = ObjectPath.from(obj, o => o.x.y.$anyIndex.s);
+
 console.log(pathTuple);
+```
+
+Output:
+```
+ObjectPath { _tuple: [ 'x', 'y', Symbol(any), 's' ] }
 ```
