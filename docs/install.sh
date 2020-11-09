@@ -1,0 +1,1 @@
+npm i docsify-cli docsify-tools -g
