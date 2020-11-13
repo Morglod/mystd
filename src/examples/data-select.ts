@@ -27,7 +27,7 @@ const itemSelector = ObjectPath.from(testData, x => x.children.$anyIndex);
 const itemTitleSelector = itemSelector.join(x => x.title);
 const itemValueSelector = itemSelector.join(x => x.value);
 
-console.log(
+console.log('spread',
     spreadOnFields({
         title: selectPath(testData, itemTitleSelector),
         value: selectPath(testData, itemValueSelector),
@@ -40,10 +40,10 @@ console.log(
 console.log(testData);
 selectPath(testData, x => x).forEach((data) => {
     data.children = spreadOnFields({
-        title: selectPath(testData, itemTitleSelector),
-        value: selectPath(testData, itemValueSelector),
+        title: selectPath(data, itemTitleSelector),
+        value: selectPath(data, itemValueSelector),
         r: groupOf(scalarsOfGroup(
-            selectPath(testData, itemValueSelector).itemsRawAsArray()
+            selectPath(data, itemValueSelector).itemsRawAsArray()
         ))
     }) as any
 })

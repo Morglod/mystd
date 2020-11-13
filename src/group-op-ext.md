@@ -1,1 +1,1 @@
-Extendable `GroupOp<T>`
+Extendable type of `GroupOp<T>`

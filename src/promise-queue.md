@@ -1,5 +1,9 @@
 # `PromiseQueue<T>`
 
+Subscribe to queue with `pop(): Promise<T>` and wait for any pushed item.
+
+## Example
+
 Socket's accept queue with buffered pending connections:
 
 ```ts

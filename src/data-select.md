@@ -1,5 +1,6 @@
-Utils for in-dataset work  
-Similar to d3's selectors but for JSONs
+Utils for in-dataset work
+
+Example:
 
 ```ts
 import { sumNumbers, scalarsOfGroup } from "../utils/math";
@@ -7,6 +8,7 @@ import { selectPath, spreadOnFields } from "../data-select";
 import { ObjectPath } from "../object-path";
 import { groupOf } from "../group-op";
 
+// We have some dataset
 const testData = {
     name: 'hello',
     children: [
@@ -18,6 +20,7 @@ const testData = {
     ]
 };
 
+// Calculate total of children.value and save it as 'total' field
 const testData2 = {
     ...testData,
     total: sumNumbers(
@@ -31,32 +34,23 @@ const itemSelector = ObjectPath.from(testData, x => x.children.$anyIndex);
 const itemTitleSelector = itemSelector.join(x => x.title);
 const itemValueSelector = itemSelector.join(x => x.value);
 
-console.log(
-    spreadOnFields({
-        title: selectPath(testData, itemTitleSelector),
-        value: selectPath(testData, itemValueSelector),
-        r: groupOf(scalarsOfGroup(
-            selectPath(testData, itemValueSelector).itemsRawAsArray()
-        ))
-    })
-)
+// Append 'r' field to children
+// r shoulde be radius calculated as [value / maximum value]
+const newChildren = spreadOnFields({
+    title: selectPath(testData, itemTitleSelector),
+    value: selectPath(testData, itemValueSelector),
+    r: groupOf(scalarsOfGroup(
+        selectPath(testData, itemValueSelector).itemsRawAsArray()
+    ))
+});
 
-console.log(testData);
-selectPath(testData, x => x).forEach((data) => {
-    data.children = spreadOnFields({
-        title: selectPath(testData, itemTitleSelector),
-        value: selectPath(testData, itemValueSelector),
-        r: groupOf(scalarsOfGroup(
-            selectPath(testData, itemValueSelector).itemsRawAsArray()
-        ))
-    }) as any
-})
+// newChildren is type of {
+//     title: string,
+//     value: number,
+//     r: number,
+// }[]
 
-console.log('---');
-
-console.log(testData);
-console.log('---');
-
+// Pick items from children which title startsWith('qwe')
 console.log(
     selectPath(
         testData,
