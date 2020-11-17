@@ -1,5 +1,1 @@
-Utils collection used in my projects
-
-```
-npm i morglod_mystd
-```
+[readme](../readme.md ':include')

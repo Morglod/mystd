@@ -6,4 +6,4 @@ Checkout `src/*.md` for docs
 npm i morglod_mystd
 ```
 
-[docs](./docs/reference.md)
+[docs](./docs/reference.md ':include')

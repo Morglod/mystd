@@ -11,11 +11,6 @@ const getLinkName = (filepath) => path.relative(rootDir, filepath).slice(0, -3);
 const refs = mds.map(x => ` - [${getLinkName(x)}](${path.relative(__dirname, x)})`).join('\n');
 
 fs.writeFileSync(
-    path.join(__dirname, './_sidebar.md'),
-    header + refs + footer,
-);
-
-fs.writeFileSync(
     path.join(__dirname, './reference.md'),
     header + refs + footer,
 );
