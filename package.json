@@ -1,16 +1,17 @@
 {
   "name": "morglod_mystd",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "types": "lib",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "glob": "^7.1.6",
     "ts-node": "^8.10.1",
-    "typescript": "^3.8.3"
+    "typescript": "3.8.3"
   }
 }
