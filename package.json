@@ -1,6 +1,6 @@
 {
   "name": "morglod_mystd",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "",
   "types": "lib",
   "scripts": {
@@ -10,6 +10,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^14.14.37",
+    "@types/react": "^17.0.5",
     "glob": "^7.1.6",
     "ts-node": "^8.10.1",
     "typescript": "3.8.3"
